@@ -1,0 +1,63 @@
+version: '2'
+
+services:
+ rabbitmq-node-1:
+  image: rabbitmq:3-management
+  container_name: rabbitmq-node-1
+  hostname: rabbitmq-node-1
+  ports:
+   - "15672:15672"
+  networks:
+   - rabbitmq-cluster-network
+  volumes:
+   - ./storage/rabbitmq-node-1:/var/lib/rabbitmq
+  environment:
+   - RABBITMQ_ERLANG_COOKIE=cluster_cookie
+   - RABBITMQ_DEFAULT_USER=admin
+   - RABBITMQ_DEFAULT_PASS=password
+
+ rabbitmq-node-2:
+  image: rabbitmq:3-management
+  container_name: rabbitmq-node-2
+  hostname: rabbitmq-node-2
+  ports:
+   - "15673:15672"
+  networks:
+   - rabbitmq-cluster-network
+  volumes:
+   - ./storage/rabbitmq-node-2:/var/lib/rabbitmq
+  environment:
+   - RABBITMQ_ERLANG_COOKIE=cluster_cookie
+   - RABBITMQ_DEFAULT_USER=admin
+   - RABBITMQ_DEFAULT_PASS=password
+
+ rabbitmq-node-3:
+  image: rabbitmq:3-management
+  container_name: rabbitmq-node-3
+  hostname: rabbitmq-node-3
+  ports:
+   - "15674:15672"
+  networks:
+   - rabbitmq-cluster-network
+  volumes:
+   - ./storage/rabbitmq-node-3:/var/lib/rabbitmq
+  environment:
+   - RABBITMQ_ERLANG_COOKIE=cluster_cookie
+   - RABBITMQ_DEFAULT_USER=admin
+   - RABBITMQ_DEFAULT_PASS=password
+
+ haproxy:
+  build:
+    context: .
+  image: haproxy/tainguyenbp
+  container_name: haproxy
+  hostname: haproxy
+  ports:
+    - "5672:5672"
+    - "1936:1936"
+  networks:
+   - rabbitmq-cluster-network
+
+networks:
+ rabbitmq-cluster-network:
+  driver: bridge
